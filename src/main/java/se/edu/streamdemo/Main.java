@@ -1,5 +1,7 @@
 package se.edu.streamdemo;
 
+import static java.util.stream.Collectors.toList;
+
 import se.edu.streamdemo.data.Datamanager;
 import se.edu.streamdemo.task.Deadline;
 import se.edu.streamdemo.task.Task;
@@ -13,11 +15,15 @@ public class Main {
         Datamanager dataManager = new Datamanager("./data/data.txt");
         ArrayList<Task> tasksData = dataManager.loadData();
 
-        System.out.println("Printing all data ...");
-        printAllData(tasksData);
+//        System.out.println("Printing all data ...");
+//        printAllData(tasksData);
 
         System.out.println("Printing deadlines ...");
         printDeadlines(tasksData);
+        printDeadlinesUsingStreams(tasksData);
+
+        ArrayList<Task> filteredList = filterList(tasksData, "11");
+        printAllData(filteredList);
 
         System.out.println("Total number of deadlines: " + countDeadlines(tasksData));
 
@@ -45,6 +51,20 @@ public class Main {
                 System.out.println(t);
             }
         }
+    }
+    public static void printDeadlinesUsingStreams(ArrayList<Task> tasks) {
+        System.out.println("Printing deadlines using streams ...");
+        tasks.stream()
+                .filter((t) -> t instanceof Deadline)
+                .sorted((t1, t2) -> t1.getDescription().compareToIgnoreCase(t2.getDescription()))
+                .forEach(System.out::println);
+    }
+
+    public static ArrayList<Task> filterList(ArrayList<Task> tasks, String filterString) {
+        ArrayList<Task> filteredList = (ArrayList<Task>) tasks.stream()
+                .filter(t -> t.getDescription().contains(filterString))
+                .collect(toList());
+        return filteredList;
     }
 
 }
